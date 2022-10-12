@@ -32,3 +32,13 @@ fn fib_iter(n: u32) -> u32 {
     }
     x
 }
+
+#[deno_bindgen]
+pub struct JsString {
+    str: Vec<String>
+}
+
+#[deno_bindgen]
+fn op_string_builder(str: &str, args: JsString) -> String {
+    str.to_owned() + &args.str.join("")
+}

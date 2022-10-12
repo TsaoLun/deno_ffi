@@ -20,7 +20,7 @@ function readPointer(v: any): Uint8Array {
   return buf
 }
 
-const url = new URL("../target/debug", import.meta.url)
+const url = new URL("../target/release", import.meta.url)
 let uri = url.toString()
 if (!uri.endsWith("/")) uri += "/"
 
@@ -42,16 +42,24 @@ const opts = {
     windows: uri + "___.dll",
     linux: uri + "lib___.so",
   },
-  policy: CachePolicy.NONE,
+  policy: undefined,
 }
 const _lib = await prepare(opts, {
   add: { parameters: ["pointer", "usize"], result: "i32", nonblocking: false },
   fib: { parameters: ["u32"], result: "u32", nonblocking: false },
   fib_iter: { parameters: ["u32"], result: "u32", nonblocking: false },
+  op_string_builder: {
+    parameters: ["pointer", "usize", "pointer", "usize"],
+    result: "pointer",
+    nonblocking: false,
+  },
 })
 export type Input = {
   a: number
   b: number
+}
+export type JsString = {
+  str: Array<string>
 }
 export function add(a0: Input) {
   const a0_buf = encode(JSON.stringify(a0))
@@ -69,4 +77,18 @@ export function fib_iter(a0: number) {
   let rawResult = _lib.symbols.fib_iter(a0)
   const result = rawResult
   return result
+}
+export function op_string_builder(a0: string, a1: JsString) {
+  const a0_buf = encode(a0)
+  const a1_buf = encode(JSON.stringify(a1))
+  const a0_ptr = Deno.UnsafePointer.of(a0_buf)
+  const a1_ptr = Deno.UnsafePointer.of(a1_buf)
+  let rawResult = _lib.symbols.op_string_builder(
+    a0_ptr,
+    a0_buf.byteLength,
+    a1_ptr,
+    a1_buf.byteLength,
+  )
+  const result = readPointer(rawResult)
+  return decode(result)
 }
