@@ -8,6 +8,7 @@ edition = "2021"
 [dependencies]
 deno_bindgen = "0.7.0"
 serde = { version = "1", features = ["derive"] }
+wasm-bindgen = "0.2.83"
 
 [lib]
 name = "___"

@@ -1,5 +1,6 @@
 import { add, fib, fib_iter, op_string_builder } from "../bindings/bindings.ts";
 import { assertEquals } from "https://deno.land/std@0.159.0/testing/asserts.ts";
+import {w_op_string_builder} from "../___.js"
 Deno.bench("rs", () => {
   add({ a: 1, b: 3 });
 });
@@ -66,6 +67,7 @@ function jsStrBuilder(pre:string, JsString:{str:string[]}){
 
 Deno.test("x", () => {
   assertEquals(op_string_builder("x", { str: ["y", "z"] }), jsStrBuilder("x", { str: ["y", "z"] }));
+  assertEquals(w_op_string_builder("z", { str: ["y", "z"]  } as any), jsStrBuilder("x", { str: ["y", "z"] }));
 });
 
 Deno.bench("ts_str", ()=>{
