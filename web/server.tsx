@@ -2,13 +2,15 @@
 import { serve } from "https://deno.land/std@0.154.0/http/server.ts";
 import { serveFile } from "https://deno.land/std@0.154.0/http/file_server.ts";
 import { h, html } from "https://deno.land/x/htm@0.0.10/mod.tsx";
+const MAIN_PAGE = "./web/index.html"
 const NOT_FOUND_SCRIPT = (pathname: string) => `
-alert(window.location.origin+" NOT FOUND ROUTE: ${pathname}")
+alert(window.location.host+" NOT FOUND ROUTE: ${pathname}")
 `;
 serve(async (_req) => {
-  const pathname = new URL(_req.url).pathname;
-  if (pathname === "/404.js") {
-    return new Response(NOT_FOUND_SCRIPT(pathname), {
+  const url = new URL(_req.url);
+  const pathname = url.pathname;
+  if (pathname === "/404") {
+    return new Response(NOT_FOUND_SCRIPT(url.searchParams.get("path")!), {
       headers: {
         "content-type": "application/javascript",
       },
@@ -16,7 +18,7 @@ serve(async (_req) => {
   }
   const res = await serveFile(
     _req,
-    pathname === "/" ? "./index.html" : `.${pathname}`,
+    pathname === "/" ? MAIN_PAGE : `.${pathname}`,
   );
   if (res.statusText !== "Not Found") {
     return res;
@@ -26,7 +28,7 @@ serve(async (_req) => {
     return sf;
   }
   return html({
-    scripts: [{ src: "/404.js" }],
+    scripts: [{ src: "./404?path="+pathname }],
     body: <div class="home"></div>,
   });
 });
