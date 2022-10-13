@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+
+<body>
+    <input id="fib1_num" size="10">
+    <button id="fib1">WASM-FIB</button>
+    <input id="fib2_num" size="10">
+    <button id="fib2">WASM-JS</button>
+</body>
+<script type="module">
+    import init, { wfib } from "../pkg/comp.js"
+    function fib(n) {
+        if (n <= 0) {
+            return 0;
+        } else if (n == 1) {
+            return 1;
+        } else {
+            return fib(n - 1) + fib(n - 2);
+        }
+    }
+    function bindCal(id, fn) {
+        document.getElementById(id).onclick = () => {
+            const num = Number(document.getElementById(id + "_num")?.value)
+            if (!((Number.isInteger(num)) && Number(num) > 0 && Number(num) < 45)) {
+                alert("请输入大于 0 小于 45 的整数!")
+                return
+            }
+            const start = new Date().getTime()
+            const v = fn(Number(num))
+            alert(`结果: ${v} 耗时:${new Date().getTime() - start} ms`)
+        }
+    }
+    init().then(() => {
+        bindCal("fib1", wfib)
+        bindCal("fib2", fib)
+    })
+</script>
+
+</html>

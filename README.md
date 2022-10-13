@@ -18,3 +18,5 @@ deno install -Afq -n deno_bindgen https://deno.land/x/deno_bindgen/cli.ts
 ```
 
 > deno_bindgen --release 
+
+> wasm-pack build --target web --release
