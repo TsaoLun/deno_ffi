@@ -10,6 +10,7 @@ rustup target add wasm32-unknown-unknown --toolchain nightly
 
 > wasm-bindgen target/wasm32-unknown-unknown/release/comp.wasm --out-dir pkg --target deno
 
+> wasm-opt -O3 pkg/comp_bg.wasm -o pkg/comp_bg.wasm
 
 ### FFI
 

@@ -24,23 +24,23 @@ const url = new URL("../target/release", import.meta.url)
 let uri = url.toString()
 if (!uri.endsWith("/")) uri += "/"
 
-let darwin: string | { aarch64: string; x86_64: string } = uri + "lib___.dylib"
+let darwin: string | { aarch64: string; x86_64: string } = uri + "libcomp.dylib"
 
 if (url.protocol !== "file:") {
   // Assume that remote assets follow naming scheme
   // for each macOS artifact.
   darwin = {
-    aarch64: uri + "lib____arm64.dylib",
-    x86_64: uri + "lib___.dylib",
+    aarch64: uri + "libcomp_arm64.dylib",
+    x86_64: uri + "libcomp.dylib",
   }
 }
 
 const opts = {
-  name: "___",
+  name: "comp",
   urls: {
     darwin,
-    windows: uri + "___.dll",
-    linux: uri + "lib___.so",
+    windows: uri + "comp.dll",
+    linux: uri + "libcomp.so",
   },
   policy: undefined,
 }
