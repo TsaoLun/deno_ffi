@@ -1,6 +1,8 @@
 import { add, fib, fib_iter, op_string_builder } from "../bindings/bindings.ts";
 import { assertEquals } from "https://deno.land/std@0.159.0/testing/asserts.ts";
-import {w_op_string_builder} from "../___.js"
+// @deno-types="../pkg/comp.d.ts"
+import { fib_witer, w_op_string_builder, wadd, wfib } from "../pkg/comp.js";
+
 Deno.bench("rs", () => {
   add({ a: 1, b: 3 });
 });
@@ -14,6 +16,11 @@ Deno.bench("ts", () => {
   tsAdd(x);
 });
 
+Deno.bench("wasm", () => {
+  const x = { a: 1, b: 3 };
+  wadd(x);
+});
+
 function fibTs(n: number): number {
   if (n <= 0) {
     return 0;
@@ -24,12 +31,20 @@ function fibTs(n: number): number {
   }
 }
 
+Deno.test("F", () => {
+  assertEquals(fibTs(30), wfib(30));
+});
+
 Deno.bench("rsFib", () => {
   fib(30);
 });
 
 Deno.bench("tsFib", () => {
   fibTs(30);
+});
+
+Deno.bench("wasmFib", () => {
+  wfib(30);
 });
 
 function fibIter(n: number) {
@@ -54,6 +69,10 @@ Deno.bench("TS_FIB_I", () => {
   fibIter(40);
 });
 
+Deno.bench("WASM_FIB_I", () => {
+  fib_witer(40);
+});
+
 const STR = "benchmark";
 const VALUES = Array.from({ length: 100000 }, (_) => STR);
 
@@ -61,15 +80,25 @@ Deno.bench("rs_str", () => {
   op_string_builder(STR, { str: VALUES });
 });
 
-function jsStrBuilder(pre:string, JsString:{str:string[]}){
-  return pre + JsString.str.join("")
+function jsStrBuilder(pre: string, JsString: { str: string[] }) {
+  return pre + JsString.str.join("");
 }
 
 Deno.test("x", () => {
-  assertEquals(op_string_builder("x", { str: ["y", "z"] }), jsStrBuilder("x", { str: ["y", "z"] }));
-  assertEquals(w_op_string_builder("z", { str: ["y", "z"]  } as any), jsStrBuilder("x", { str: ["y", "z"] }));
+  assertEquals(
+    op_string_builder("x", { str: ["y", "z"] }),
+    jsStrBuilder("x", { str: ["y", "z"] }),
+  );
+  assertEquals(
+    w_op_string_builder("x", { str: ["y", "z"] }),
+    jsStrBuilder("x", { str: ["y", "z"] }),
+  );
 });
 
-Deno.bench("ts_str", ()=>{
-  jsStrBuilder(STR, { str: VALUES })
-})
+Deno.bench("ts_str", () => {
+  jsStrBuilder(STR, { str: VALUES });
+});
+
+Deno.bench("wasm_str", () => {
+  w_op_string_builder(STR, { str: VALUES });
+});

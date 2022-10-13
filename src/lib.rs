@@ -1,5 +1,7 @@
 use deno_bindgen::deno_bindgen;
 use wasm_bindgen::prelude::*;
+use serde::{Serialize, Deserialize};
+use serde_wasm_bindgen;
 
 #[deno_bindgen]
 pub struct Input {
@@ -44,15 +46,16 @@ fn op_string_builder(str: &str, args: JsString) -> String {
     str.to_owned() + &args.str.join("")
 }
 
-#[wasm_bindgen]
+#[derive(Serialize, Deserialize)]
 pub struct WInput {
-  a: i32,
-  b: i32,
+  pub a: i32,
+  pub b: i32,
 }
 
 #[wasm_bindgen]
-pub fn wadd(input: WInput) -> i32 {
-  input.a + input.b
+pub fn wadd(input: JsValue) -> i32 {
+    let input: WInput = serde_wasm_bindgen::from_value(input).unwrap();
+    input.a + input.b
 }
 
 #[wasm_bindgen]
@@ -77,12 +80,13 @@ pub fn fib_witer(n: u32) -> u32 {
     x
 }
 
-#[wasm_bindgen]
+#[derive(Serialize, Deserialize)]
 pub struct WJsString {
-    str: Vec<String>
+    pub str: Vec<String>
 }
 
 #[wasm_bindgen]
-pub fn w_op_string_builder(str: &str, args: WJsString) -> String {
-    str.to_owned() + &args.str.join("")
+pub fn w_op_string_builder(str: &str, args: JsValue) -> String {
+    let s: WJsString = serde_wasm_bindgen::from_value(args).unwrap();
+    str.to_owned() + &s.str.join("")
 }
